@@ -1,0 +1,4 @@
+interface:
+  display_name: "UniSender Skill Factory"
+  short_description: "Turn proven UniSender solutions into skills"
+  default_prompt: "Use $unisender-skill-factory to capture a proven UniSender solution and prepare a safe versioned skill release."
