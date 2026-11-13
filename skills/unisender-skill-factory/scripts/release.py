@@ -80,7 +80,7 @@ def main() -> int:
 
     tag = f"{args.skill}-v{new_version}"
     if args.publish:
-        run(["git", "add", f"skills/{args.skill}/VERSION", f"skills/{args.skill}/CHANGELOG.md", "catalog.json"], root)
+        run(["git", "add", "--", f"skills/{args.skill}", "catalog.json", "tests"], root)
         run(["git", "commit", "-m", f"release({args.skill}): v{new_version}"], root)
         run(["git", "tag", "-a", tag, "-m", f"{args.skill} v{new_version}"], root)
         run(["git", "push", "origin", "HEAD"], root)

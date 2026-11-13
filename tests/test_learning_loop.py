@@ -9,6 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "skills" / "unisender-skill-factory" / "scripts" / "learning_loop.py"
+RELEASE_SCRIPT = ROOT / "skills" / "unisender-skill-factory" / "scripts" / "release.py"
 
 
 def load_module():
@@ -19,7 +20,21 @@ def load_module():
     return module
 
 
+def load_release_module():
+    spec = importlib.util.spec_from_file_location("release", RELEASE_SCRIPT)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader
+    spec.loader.exec_module(module)
+    return module
+
+
 class LearningLoopTests(unittest.TestCase):
+    def test_semantic_version_bumps(self):
+        module = load_release_module()
+        self.assertEqual("1.2.4", module.bump_version("1.2.3", "patch"))
+        self.assertEqual("1.3.0", module.bump_version("1.2.3", "minor"))
+        self.assertEqual("2.0.0", module.bump_version("1.2.3", "major"))
+
     def test_sensitive_data_is_detected(self):
         module = load_module()
         email = "real.person" + "@company.ru"
