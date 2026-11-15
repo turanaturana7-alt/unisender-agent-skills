@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "version": "0.2.0",
-  "skill_hash": "af030e7736b598ec786da417b3086a6e7c6e2a9ef25e114bbcb96f0f7d6a847d",
-  "evaluated_at": "2026-11-15T11:16:29+00:00",
+  "version": "0.2.1",
+  "skill_hash": "8ef2d223cae222452eb9ad27d8b15e323d7a8ab8974d92818f3dedc523dc4c8f",
+  "evaluated_at": "2026-11-15T11:24:03+00:00",
   "model": "codex-default",
   "passed_cases": 6,
   "total_cases": 6,

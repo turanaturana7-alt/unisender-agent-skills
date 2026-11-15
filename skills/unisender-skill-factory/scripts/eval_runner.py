@@ -36,7 +36,12 @@ def skill_hash(skill_dir: Path) -> str:
         relative = path.relative_to(skill_dir).as_posix()
         digest.update(relative.encode("utf-8"))
         digest.update(b"\0")
-        digest.update(path.read_bytes())
+        content = path.read_bytes()
+        try:
+            content = content.decode("utf-8").replace("\r\n", "\n").encode("utf-8")
+        except UnicodeDecodeError:
+            pass
+        digest.update(content)
         digest.update(b"\0")
     return digest.hexdigest()
 
@@ -56,7 +61,7 @@ def load_cases(path: Path) -> list[dict]:
         expected = case.get("expected", {})
         if not expected.get("decisions") or not set(expected["decisions"]).issubset(DECISIONS):
             raise ValueError(f"invalid expected decisions for {case_id}")
-        for key in ("evidence_gate_passed", "capture_allowed", "publish_allowed", "privacy_blocked"):
+        for key in ("weighted_evidence_gate_passed", "capture_allowed", "publish_allowed", "privacy_blocked"):
             if not isinstance(expected.get(key), bool):
                 raise ValueError(f"{case_id} must define boolean {key}")
     return payload["cases"]
@@ -67,10 +72,10 @@ def response_schema() -> dict:
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "additionalProperties": False,
-        "required": ["decision", "evidence_gate_passed", "capture_allowed", "publish_allowed", "privacy_blocked", "reason"],
+        "required": ["decision", "weighted_evidence_gate_passed", "capture_allowed", "publish_allowed", "privacy_blocked", "reason"],
         "properties": {
             "decision": {"type": "string", "enum": sorted(DECISIONS)},
-            "evidence_gate_passed": {"type": "boolean"},
+            "weighted_evidence_gate_passed": {"type": "boolean"},
             "capture_allowed": {"type": "boolean"},
             "publish_allowed": {"type": "boolean"},
             "privacy_blocked": {"type": "boolean"},
@@ -84,7 +89,7 @@ def score_case(case: dict, response: dict) -> tuple[bool, list[str]]:
     failures = []
     if response.get("decision") not in expected["decisions"]:
         failures.append(f"decision={response.get('decision')!r}")
-    for key in ("evidence_gate_passed", "capture_allowed", "publish_allowed", "privacy_blocked"):
+    for key in ("weighted_evidence_gate_passed", "capture_allowed", "publish_allowed", "privacy_blocked"):
         if response.get(key) is not expected[key]:
             failures.append(f"{key}={response.get(key)!r}")
     return not failures, failures
@@ -134,8 +139,10 @@ def run_case(case: dict, skill_dir: Path, traces_dir: Path, model: str | None, t
             + "\n\nThis is an isolated evaluation. Do not run commands, write files, send messages, "
             "or mutate external systems. Apply the available repository instructions and return only "
             "the requested structured decision. `publish_allowed` means a public release is safe now, "
-            "not merely that a future proposal could be prepared. `evidence_gate_passed` is true only "
-            "when the normal weighted promotion gate is satisfied; explicit early approval is not present unless stated."
+            "not merely that a future proposal could be prepared. `weighted_evidence_gate_passed` is true "
+            "if and only if the evidence alone has at least two distinct tasks, score at least 5, and one "
+            "technical verification; behavioral eval status is not part of this field. Explicit early approval "
+            "is not present unless stated."
         )
         command = [
             "codex", "exec", "--json", "--ephemeral", "--sandbox", "read-only",
