@@ -31,6 +31,15 @@ Replace real values with clearly fake placeholders. Do not rely on redaction alo
 
 ## Promotion decision
 
-Two successes are necessary by default, not sufficient. Reject promotion if the pattern conflicts with vendor documentation, depends on undocumented account state, broadens permissions, or cannot be tested without affecting a live campaign.
+Use these default evidence weights:
+
+- authorized delivery test: 4;
+- saved interface state plus read-back: 3;
+- relevant artifact QA: 2;
+- user acceptance without technical verification: 1.
+
+Normal promotion requires two distinct task fingerprints, a total score of at least 5, and at least one technical verification. Two successes are necessary by default, not sufficient. Reject promotion if the pattern conflicts with vendor documentation, depends on undocumented account state, broadens permissions, or cannot be tested without affecting a live campaign.
+
+An early user-approved proposal still requires one technically verified case and a score of at least 2. It remains a proposal until behavioral evals pass.
 
 When a new observation changes only one edge case, update the narrowest existing instruction and release a patch. Do not accumulate universal rules from isolated examples.

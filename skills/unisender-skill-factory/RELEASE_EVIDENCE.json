@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "version": "0.2.0",
+  "skill_hash": "af030e7736b598ec786da417b3086a6e7c6e2a9ef25e114bbcb96f0f7d6a847d",
+  "evaluated_at": "2026-11-15T11:16:29+00:00",
+  "model": "codex-default",
+  "passed_cases": 6,
+  "total_cases": 6,
+  "pass_rate": 1.0
+}
