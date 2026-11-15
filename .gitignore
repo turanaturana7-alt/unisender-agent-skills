@@ -1,4 +1,6 @@
 .skill-learning/
+.skill-evals/
+.playwright-mcp/
 __pycache__/
 *.pyc
 .pytest_cache/

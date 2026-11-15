@@ -19,5 +19,7 @@ jobs:
           python-version: "3.12"
       - name: Audit public files
         run: python skills/unisender-skill-factory/scripts/learning_loop.py audit-public --repo-root .
+      - name: Validate behavioral eval cases
+        run: python skills/unisender-skill-factory/scripts/eval_runner.py validate --cases skills/unisender-skill-factory/evals/cases.json
       - name: Test learning loop
         run: python -m unittest discover -s tests -v
